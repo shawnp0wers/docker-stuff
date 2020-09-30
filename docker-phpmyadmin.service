@@ -1,0 +1,25 @@
+[Unit]
+Description=PHPMyAdmin Container
+After=docker.service
+Requires=docker.service
+
+[Service]
+User=root
+TimeoutStartSec=0
+ExecStartPre=-/usr/bin/docker kill phpmyadmin
+ExecStartPre=-/usr/bin/docker rm phpmyadmin
+ExecStartPre=/usr/bin/docker pull phpmyadmin
+ExecStart=/usr/bin/docker run \
+        --name phpmyadmin \
+        -e PMA_HOST=mysql \
+        -e PMA_ARBITRARY=1 \
+        -e UPLOAD_LIMIT=65536K \
+        -e TZ=America/Detroit \
+        --network="mysql-net" \
+        -p 8080:80 \
+        phpmyadmin
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
